@@ -15,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AddTaskDialogComponent } from '../../components/add-task-dialog/add-task-dialog.component';
+import { MatIcon } from "@angular/material/icon";
 @Component({
   selector: 'app-task-list',
   imports: [NavbarComponent, CommonModule,
@@ -27,15 +28,16 @@ import { AddTaskDialogComponent } from '../../components/add-task-dialog/add-tas
     MatSelectModule,
     MatButtonModule,
     MatDatepickerModule,
-    MatNativeDateModule,
-  ],
+    MatNativeDateModule, MatIcon],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
 export class TaskListComponent {
 
   tasks: Task[] = [];
-  displayedColumns: string[] = ['title', 'status', 'priority', 'dueDate'];
+  // displayedColumns: string[] = ['title', 'status', 'priority', 'dueDate'];
+  displayedColumns = ['title', 'status', 'priority', 'dueDate', 'actions'];
+
   constructor(
     private tasksService: TasksService,
     private dialog: MatDialog
@@ -58,5 +60,26 @@ export class TaskListComponent {
       }
     });
   }
+
+  editTask(task: Task): void {
+    const dialogRef = this.dialog.open(AddTaskDialogComponent, {
+      width: '400px',
+      data: task
+    });
+
+    dialogRef.afterClosed().subscribe(updatedTask => {
+      if (updatedTask) {
+        this.tasks = this.tasks.map(t =>
+          t.id === updatedTask.id ? updatedTask : t
+        );
+      }
+    });
+  }
+
+  deleteTask(taskId: number): void {
+    this.tasks = this.tasks.filter(task => task.id !== taskId);
+  }
+
+
 
 }
