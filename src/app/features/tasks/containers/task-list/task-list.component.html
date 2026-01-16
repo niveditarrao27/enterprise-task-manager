@@ -12,8 +12,8 @@
             </button>
         </div>
 
-        <table mat-table [dataSource]="tasks" class="mat-elevation-z8">
-
+        <!-- <table mat-table [dataSource]="tasks" class="mat-elevation-z8"> -->
+        <table mat-table [dataSource]="(tasks$ | async) || []" class="mat-elevation-z8">
             <!-- Title -->
             <ng-container matColumnDef="title">
                 <th mat-header-cell *matHeaderCellDef> Title </th>

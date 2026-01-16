@@ -16,6 +16,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { AddTaskDialogComponent } from '../../components/add-task-dialog/add-task-dialog.component';
 import { MatIcon } from "@angular/material/icon";
+import { Store } from '@ngrx/store';
+import { selectAllTasks } from '../../store/task.selectors';
+import { Observable } from 'rxjs';
+import * as TaskActions from '../../store/task.actions';
 @Component({
   selector: 'app-task-list',
   imports: [NavbarComponent, CommonModule,
@@ -34,20 +38,31 @@ import { MatIcon } from "@angular/material/icon";
 })
 export class TaskListComponent {
 
-  tasks: Task[] = [];
+  // tasks: Task[] = [];
+  tasks$: Observable<Task[]>;
   // displayedColumns: string[] = ['title', 'status', 'priority', 'dueDate'];
   displayedColumns = ['title', 'status', 'priority', 'dueDate', 'actions'];
 
   constructor(
     private tasksService: TasksService,
-    private dialog: MatDialog
-  ) { }
+    private dialog: MatDialog,
+    private store: Store
+  ) {
+    this.tasks$ = this.store.select(selectAllTasks);
+  }
 
   ngOnInit(): void {
-    this.tasksService.getTasks().subscribe((tasks: Task[]) => {
-      this.tasks = tasks;
+    // this.tasksService.getTasks().subscribe((tasks: Task[]) => {
+    //   this.tasks = tasks;
+    // });
+
+    // this.store.dispatch(TaskActions.loadTasks());
+
+    this.tasksService.getTasks().subscribe(tasks => {
+      this.store.dispatch(TaskActions.loadTasksSuccess({ tasks }));
     });
   }
+
 
   openAddTaskDialog(): void {
     const dialogRef = this.dialog.open(AddTaskDialogComponent, {
@@ -55,9 +70,9 @@ export class TaskListComponent {
     });
 
     dialogRef.afterClosed().subscribe((newTask) => {
-      if (newTask) {
-        this.tasks = [...this.tasks, newTask];
-      }
+      // if (newTask) {
+      //   this.tasks = [...this.tasks, newTask];
+      // }
     });
   }
 
@@ -68,16 +83,16 @@ export class TaskListComponent {
     });
 
     dialogRef.afterClosed().subscribe(updatedTask => {
-      if (updatedTask) {
-        this.tasks = this.tasks.map(t =>
-          t.id === updatedTask.id ? updatedTask : t
-        );
-      }
+      // if (updatedTask) {
+      //   this.tasks = this.tasks.map(t =>
+      //     t.id === updatedTask.id ? updatedTask : t
+      //   );
+      // }
     });
   }
 
   deleteTask(taskId: number): void {
-    this.tasks = this.tasks.filter(task => task.id !== taskId);
+    // this.tasks = this.tasks.filter(task => task.id !== taskId);
   }
 
 
